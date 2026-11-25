@@ -26,6 +26,7 @@ ENV PHARMA_FS_DATA_DIR=/app/data \
 EXPOSE 8000
 
 # One uvicorn process by default. The Feast online read is synchronous and
-# CPU-heavy in Python, so throughput scales with processes, not threads;
-# raise --workers for more throughput (see docs/05-benchmarks.md).
+# spends most of its time in Python, so one process saturates early (see
+# docs/05-benchmarks.md). Adding processes (--workers N, or more replicas) is the
+# usual way to scale; that was not benchmarked in this repo.
 CMD ["uvicorn", "pharma_fs.api:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,94 @@
+[
+  {
+    "target": "sdk",
+    "mode": "single",
+    "concurrency": 1,
+    "n": 1000,
+    "p50_ms": 1.84,
+    "p95_ms": 15.65,
+    "p99_ms": 1655.1,
+    "mean_ms": 89.99,
+    "throughput_rps": 11.1
+  },
+  {
+    "target": "sdk",
+    "mode": "batch",
+    "concurrency": 1,
+    "batch_size": 50,
+    "n": 1000,
+    "p50_ms": 16.08,
+    "p95_ms": 139.17,
+    "p99_ms": 3125.46,
+    "mean_ms": 132.8,
+    "throughput_rps": 7.5
+  },
+  {
+    "target": "http",
+    "mode": "single",
+    "concurrency": 1,
+    "n": 1000,
+    "p50_ms": 4.17,
+    "p95_ms": 13.63,
+    "p99_ms": 19.05,
+    "mean_ms": 5.52,
+    "throughput_rps": 180.2
+  },
+  {
+    "target": "http",
+    "mode": "single",
+    "concurrency": 10,
+    "n": 1000,
+    "p50_ms": 48.93,
+    "p95_ms": 522.39,
+    "p99_ms": 1003.11,
+    "mean_ms": 123.13,
+    "throughput_rps": 81.1
+  },
+  {
+    "target": "http",
+    "mode": "single",
+    "concurrency": 50,
+    "n": 1000,
+    "p50_ms": 320.54,
+    "p95_ms": 1243.64,
+    "p99_ms": 1854.81,
+    "mean_ms": 435.93,
+    "throughput_rps": 113.2
+  },
+  {
+    "target": "http",
+    "mode": "batch",
+    "concurrency": 1,
+    "batch_size": 50,
+    "n": 1000,
+    "p50_ms": 15.2,
+    "p95_ms": 22.1,
+    "p99_ms": 26.74,
+    "mean_ms": 16.15,
+    "throughput_rps": 59.1
+  },
+  {
+    "target": "http",
+    "mode": "batch",
+    "concurrency": 10,
+    "batch_size": 50,
+    "n": 1000,
+    "p50_ms": 134.85,
+    "p95_ms": 193.57,
+    "p99_ms": 221.91,
+    "mean_ms": 137.33,
+    "throughput_rps": 72.3
+  },
+  {
+    "target": "http",
+    "mode": "batch",
+    "concurrency": 50,
+    "batch_size": 50,
+    "n": 1000,
+    "p50_ms": 663.68,
+    "p95_ms": 770.4,
+    "p99_ms": 1902.37,
+    "mean_ms": 680.18,
+    "throughput_rps": 72.8
+  }
+]

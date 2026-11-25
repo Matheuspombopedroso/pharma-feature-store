@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "httpx>=0.27", "ruff>=0.5"]
+dev = ["pytest>=8", "httpx>=0.27", "ruff==0.17.6"]  # ruff pinned: formatter output changes between releases
 
 [project.scripts]
 pharma-fs = "pharma_fs.cli:main"

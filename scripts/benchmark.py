@@ -66,7 +66,7 @@ async def _http_scenario(
     """Run one (mode, concurrency) HTTP scenario and summarise latencies."""
     rng = random.Random(0)
     limits = httpx.Limits(max_connections=concurrency, max_keepalive_connections=concurrency)
-    async with httpx.AsyncClient(base_url=url, limits=limits, timeout=30) as client:
+    async with httpx.AsyncClient(base_url=url, limits=limits, timeout=120) as client:
 
         async def one() -> float:
             if mode == "single":

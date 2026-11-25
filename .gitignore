@@ -13,7 +13,7 @@ data/
 # Local env
 .env
 
-# Agent / editor tooling (not part of the project)
+# Local editor and tooling files (not part of the project)
 .claude/
 .orca/
 CLAUDE.md

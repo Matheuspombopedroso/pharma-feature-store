@@ -1,0 +1,11 @@
+### workers=1  2026-11-25T21:52:39Z
+command: python scripts/benchmark.py --url http://localhost:8077 --requests 1000 --warmup 50 --concurrency 1 10 50 --batch-size 50 
+target mode      bs conc      n      p50      p95      p99      rps
+sdk    single     1    1   1000     1.84    15.65   1655.1     11.1
+sdk    batch     50    1   1000    16.08   139.17  3125.46      7.5
+http   single     1    1   1000     4.17    13.63    19.05    180.2
+http   single     1   10   1000    48.93   522.39  1003.11     81.1
+http   single     1   50   1000   320.54  1243.64  1854.81    113.2
+http   batch     50    1   1000     15.2     22.1    26.74     59.1
+http   batch     50   10   1000   134.85   193.57   221.91     72.3
+http   batch     50   50   1000   663.68    770.4  1902.37     72.8
