@@ -11,8 +11,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Copy only what pip needs first, so code edits do not invalidate the
-# (slow) dependency layer.
+# Install the package (and its dependencies) before copying feature_repo/, so
+# edits to the Feast config do not trigger a reinstall. Edits under src/ do.
 COPY pyproject.toml README.md LICENSE ./
 COPY src ./src
 RUN pip install .

@@ -67,6 +67,15 @@ it also asserts that rows after the cutoff *did* change.
 `test_consumption_window_matches_raw_events` recomputes `consumption_7d_g` from raw
 events with an independent filter, `[D-7d, D)`.
 
+## What to look at
+
+The generate step prints the size of each feature table. With the default seed:
+`ingredient_consumption`, `stock_coverage` and `expiration` have 36,000 rows each
+(200 pairs × 180 days), `supplier_lead_time` has 26,628 (rows start only after the
+first receipt), and `quote_conversion` and `production` have 900 each (5 pharmacies ×
+180 days). In a table, check that `event_timestamp` values are midnights UTC and that
+the first day's 30-day window is partial.
+
 ## Run just this part
 
 ```bash

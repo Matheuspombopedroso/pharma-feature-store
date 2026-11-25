@@ -63,8 +63,9 @@ pharma-fs generate     # writes data/raw/*.parquet and data/features/*.parquet
 
 ## What to look at
 
-The command prints row counts. With the default seed you should see about 103k
-consumption events, 36,000 stock snapshots (5 × 40 × 180) and about 25k quotes.
+The command prints row counts. With the default seed: 101,136 consumption events,
+36,000 stock snapshots (5 × 40 × 180), 867 purchase orders, 1,027 lots, 32,457 quotes
+and 14,917 production orders.
 You can inspect any table with pandas:
 
 ```python

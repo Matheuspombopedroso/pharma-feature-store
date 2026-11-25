@@ -54,6 +54,7 @@ def _corrupt_future(raw, cutoff: pd.Timestamp):
 
 
 def test_future_events_do_not_change_past_features(small_world):
+    """Corrupting events at/after a cutoff leaves earlier feature rows unchanged."""
     # Day 45 of the 60-day small world: late enough that every table has rows.
     cutoff = pd.Timestamp("2026-02-15", tz="UTC")
     original = small_world.tables

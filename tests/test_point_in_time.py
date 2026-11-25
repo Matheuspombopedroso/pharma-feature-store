@@ -30,6 +30,7 @@ UTC = "UTC"
 
 
 def _ts(s: str) -> pd.Timestamp:
+    """Parse a UTC timestamp string."""
     return pd.Timestamp(s, tz=UTC)
 
 
@@ -70,6 +71,7 @@ def sentinel_store(tmp_path):
 
 
 def test_sentinel_from_the_future_never_leaks(sentinel_store):
+    """A value stamped 1 s after a training row never reaches that row."""
     entity_df = pd.DataFrame(
         {
             "pharmacy_id": ["ph_a", "ph_a", "ph_a", "ph_a", "ph_b", "ph_a"],
@@ -155,6 +157,7 @@ def _oracle(entity_df: pd.DataFrame, table: pd.DataFrame, keys: list[str], cols:
 
 
 def test_historical_features_match_backward_asof_oracle(small_world):
+    """Feast's PIT join equals an independent backward as-of join for all views."""
     entity_df = _random_entity_df(small_world)
     refs = [f"{fv.name}:{f.name}" for fv in ALL_FEATURE_VIEWS for f in fv.features]
     got = (

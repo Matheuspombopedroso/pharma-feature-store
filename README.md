@@ -151,10 +151,10 @@ scenario sends 1000 requests after 50 warm-up requests, and every request return
 | HTTP `POST /features/batch` (50) | 10 | 125.83 | 179.99 | 212.78 | 78.5 |
 | HTTP `POST /features/batch` (50) | 50 | 698.76 | 920.24 | 1684.03 | 68.9 |
 
-Takeaways: a single-entity online read takes ~4 ms over HTTP (~2 ms through the SDK
-alone). A 50-entity batch takes ~14 ms, about 0.3 ms per entity. One Python process
-saturates at roughly 230–285 single requests/s, and above that extra concurrency only
-adds queueing. Tail latencies varied between runs on this machine (one run had
+Takeaways: a single-entity online read had a p50 of 4.09 ms over HTTP (1.90 ms through
+the SDK alone). A 50-entity batch had a p50 of 14.22 ms, ≈0.28 ms per entity. One Python
+process handled 225.8–284.7 single requests/s, and above concurrency 10 extra clients
+only added queueing (p50 234.18 ms at concurrency 50). Tail latencies varied between runs on this machine (one run had
 multi-second p99 outliers), so p99 is indicative only. Multi-worker scaling was **not**
 measured: uvicorn's multi-process mode failed on Windows.
 
@@ -179,8 +179,8 @@ measured: uvicorn's multi-process mode failed on Windows.
 * **Sync handlers + one Feast call per request.** The Feast SDK read is blocking, so the
   handlers are `def` and FastAPI runs them in its thread pool. The batch endpoint
   fetches all entities in one `get_online_features` call.
-* **File offline store.** This is simple and reproducible, and fine for about 140k
-  feature rows. A real deployment would use a warehouse (BigQuery, Snowflake, Spark)
+* **File offline store.** This is simple and reproducible, and fine for the 136,428
+  feature rows here. A real deployment would use a warehouse (BigQuery, Snowflake, Spark)
   and a scheduler for materialization.
 
 ## Limitations

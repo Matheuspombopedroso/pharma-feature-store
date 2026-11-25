@@ -12,6 +12,7 @@ from pharma_fs.store import apply_definitions, build_store
 
 @pytest.fixture(scope="module")
 def client(small_world, tmp_path_factory):
+    """TestClient over a SQLite-backed, fully materialized store."""
     tmp = tmp_path_factory.mktemp("api")
     store = build_store(small_world.root / "feature_repo", tmp / "registry.db")
     apply_definitions(store)
@@ -21,6 +22,7 @@ def client(small_world, tmp_path_factory):
 
 
 def _latest(world, table: str, **keys):
+    """Latest offline row of ``table`` matching ``keys`` (what online should serve)."""
     t = world.tables[table]
     for k, v in keys.items():
         t = t[t[k] == v]
@@ -28,16 +30,19 @@ def _latest(world, table: str, **keys):
 
 
 def test_health(client):
+    """Health reports ok and the configured online store type."""
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json() == {"status": "ok", "online_store": "sqlite"}
 
 
 def test_list_features(client):
+    """The catalogue endpoint returns exactly the served feature refs."""
     assert client.get("/features").json()["features"] == FEATURE_REFS
 
 
 def test_single_entity_matches_latest_offline_row(client, small_world):
+    """Online values equal the latest offline snapshot for that entity."""
     r = client.get("/features/ph_002/ing_0003")
     assert r.status_code == 200
     f = r.json()["features"]
@@ -52,10 +57,12 @@ def test_single_entity_matches_latest_offline_row(client, small_world):
 
 
 def test_unknown_entity_is_404(client):
+    """An entity with no features at all yields 404, not a row of nulls."""
     assert client.get("/features/ph_404/ing_9999").status_code == 404
 
 
 def test_batch_preserves_order_and_nulls_unknown(client):
+    """Batch results follow request order; unknown entities get nulls."""
     body = {
         "entities": [
             {"pharmacy_id": "ph_003", "ingredient_id": "ing_0006"},
@@ -74,6 +81,7 @@ def test_batch_preserves_order_and_nulls_unknown(client):
 
 
 def test_batch_validation(client):
+    """Empty and oversized batches are rejected with 422."""
     assert client.post("/features/batch", json={"entities": []}).status_code == 422
     too_many = [{"pharmacy_id": "ph_001", "ingredient_id": "ing_0001"}] * (MAX_BATCH + 1)
     assert client.post("/features/batch", json={"entities": too_many}).status_code == 422

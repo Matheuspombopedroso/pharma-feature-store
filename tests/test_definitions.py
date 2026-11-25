@@ -31,29 +31,34 @@ SOURCE_TABLE = {
 
 
 def test_all_expected_views_with_entities():
+    """All 8 feature views exist with the intended entity keys."""
     got = {fv.name: set(fv.entities) for fv in ALL_FEATURE_VIEWS}
     assert got == EXPECTED_VIEWS
 
 
 def test_views_are_online_with_daily_ttl():
+    """Every view is served online and uses the 2-day ttl."""
     for fv in ALL_FEATURE_VIEWS:
         assert fv.online, fv.name
         assert fv.ttl == timedelta(days=2), fv.name
 
 
 def test_feature_names_are_unique_across_views():
+    """Bare feature names do not collide across views."""
     # The API returns features by bare name, so collisions would overwrite values.
     names = [f.name for fv in ALL_FEATURE_VIEWS for f in fv.features]
     assert len(names) == len(set(names))
 
 
 def test_registry_round_trip(small_world):
+    """Applied definitions can be read back from the registry."""
     registered = {fv.name for fv in small_world.store.list_feature_views()}
     assert registered == set(EXPECTED_VIEWS)
     assert {e.name for e in small_world.store.list_entities()} == {"pharmacy", "ingredient"}
 
 
 def test_schema_columns_exist_in_source_tables(small_world):
+    """Every declared feature and join key exists in its Parquet source."""
     for fv in ALL_FEATURE_VIEWS:
         df = small_world.tables[SOURCE_TABLE[fv.name]]
         join_keys = {"pharmacy": "pharmacy_id", "ingredient": "ingredient_id"}
@@ -65,6 +70,7 @@ def test_schema_columns_exist_in_source_tables(small_world):
 
 
 def test_feature_value_ranges(small_world):
+    """Basic sanity ranges hold for the generated feature values."""
     t = small_world.tables
     assert (t["ingredient_consumption"]["consumption_7d_g"] >= 0).all()
     assert (

@@ -65,6 +65,12 @@ After `store.apply(...)`, Feast adds the entity join-key columns to each view's
 `schema`. Code that lists features must therefore use `fv.features`, not `fv.schema`.
 Otherwise it requests `ingredient_consumption_7d:ingredient_id` and fails.
 
+## What to look at
+
+After `pharma-fs apply`, `data/registry.db` exists. `feast -c feature_repo
+feature-views list` (with `REDIS_CONNECTION_STRING` set) lists the 8 views and their
+entities. `test_registry_round_trip` checks the same thing programmatically.
+
 ## Run just this part
 
 ```bash

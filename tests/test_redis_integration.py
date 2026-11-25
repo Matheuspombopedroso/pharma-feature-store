@@ -18,6 +18,7 @@ HOST_PORT = os.environ.get("REDIS_CONNECTION_STRING", "localhost:6379").split(",
 
 
 def _redis_up() -> bool:
+    """True if a Redis server answers PING at HOST_PORT."""
     host, port = HOST_PORT.split(":")
     try:
         return bool(redis.Redis(host=host, port=int(port), socket_connect_timeout=0.5).ping())
@@ -28,6 +29,7 @@ def _redis_up() -> bool:
 @pytest.mark.redis
 @pytest.mark.skipif(not _redis_up(), reason=f"no Redis at {HOST_PORT}")
 def test_materialize_and_read_back_from_redis(small_world, tmp_path):
+    """Materialize into real Redis (db 15) and read the latest values back."""
     host, port = HOST_PORT.split(":")
     redis.Redis(host=host, port=int(port), db=15).flushdb()
     store = build_store(

@@ -96,6 +96,7 @@ def create_app(store_factory: Callable[[], FeatureStore] | None = None) -> FastA
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        """Create the store once at startup and warm it up before serving."""
         if store_factory is None:
             from pharma_fs.store import default_store  # deferred: reads env at startup
 

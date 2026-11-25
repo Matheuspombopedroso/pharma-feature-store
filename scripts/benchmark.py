@@ -41,6 +41,7 @@ def _pct(values: list[float], q: float) -> float:
 
 
 def _summary(lat_s: list[float], wall_s: float, label: dict[str, Any]) -> dict[str, Any]:
+    """Turn per-request latencies (seconds) into percentile/throughput stats."""
     ms = [x * 1000 for x in lat_s]
     return {
         **label,
@@ -54,6 +55,7 @@ def _summary(lat_s: list[float], wall_s: float, label: dict[str, Any]) -> dict[s
 
 
 def _random_key(rng: random.Random) -> dict[str, str]:
+    """Pick a random (pharmacy, ingredient) entity from the default catalogue."""
     return {
         "pharmacy_id": rng.choice(config.pharmacy_ids()),
         "ingredient_id": rng.choice(config.ingredient_ids()),
@@ -69,6 +71,7 @@ async def _http_scenario(
     async with httpx.AsyncClient(base_url=url, limits=limits, timeout=120) as client:
 
         async def one() -> float:
+            """Send one request and return its latency in seconds."""
             if mode == "single":
                 k = _random_key(rng)
                 t0 = time.perf_counter()
@@ -88,6 +91,7 @@ async def _http_scenario(
         remaining = n_requests
 
         async def worker() -> None:
+            """Closed-loop client: send the next request as soon as one completes."""
             nonlocal remaining
             while remaining > 0:
                 remaining -= 1
@@ -113,6 +117,7 @@ def _sdk_scenario(mode: str, n_requests: int, batch_size: int, warmup: int) -> d
     size = 1 if mode == "single" else batch_size
 
     def one() -> float:
+        """Send one request and return its latency in seconds."""
         rows = [_random_key(rng) for _ in range(size)]
         t0 = time.perf_counter()
         store.get_online_features(features=FEATURE_REFS, entity_rows=rows).to_dict()
@@ -130,6 +135,7 @@ def _sdk_scenario(mode: str, n_requests: int, batch_size: int, warmup: int) -> d
 
 
 def _print_table(results: list[dict[str, Any]]) -> None:
+    """Print results as a fixed-width table (the format kept in docs/raw/)."""
     hdr = f"{'target':6} {'mode':7} {'bs':>4} {'conc':>4} {'n':>6} {'p50':>8} {'p95':>8} "
     hdr += f"{'p99':>8} {'rps':>8}"
     print(hdr)

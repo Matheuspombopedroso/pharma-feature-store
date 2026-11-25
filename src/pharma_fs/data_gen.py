@@ -90,6 +90,7 @@ def _simulate_inventory(
     fifo: list[list[float]] = []
 
     def receive_lot(ts: pd.Timestamp, qty: float) -> None:
+        """Register a received lot and append it to the FIFO queue."""
         lot_idx = len(lots)
         lots.append(
             {
@@ -261,6 +262,7 @@ def generate_raw(seed: int = config.SEED) -> RawData:
         prod += p
 
     def frame(rows: list[dict], ts_cols: list[str]) -> pd.DataFrame:
+        """Build a DataFrame and normalise ``ts_cols`` to tz-aware UTC microseconds."""
         df = pd.DataFrame(rows)
         for col in ts_cols:
             # Normalise everything to tz-aware UTC microseconds; mixing naive

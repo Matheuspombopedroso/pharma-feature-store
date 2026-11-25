@@ -9,6 +9,7 @@ from pharma_fs.store import apply_definitions, build_store
 
 
 def _online_7d(store, ph: str, ing: str) -> float:
+    """Read consumption_7d_g for one entity from the online store."""
     resp = store.get_online_features(
         features=["ingredient_consumption_7d:consumption_7d_g"],
         entity_rows=[{"pharmacy_id": ph, "ingredient_id": ing}],
@@ -17,12 +18,14 @@ def _online_7d(store, ph: str, ing: str) -> float:
 
 
 def _offline_7d(world, ph: str, ing: str, at: pd.Timestamp) -> float:
+    """Latest offline consumption_7d_g for one entity at or before ``at``."""
     t = world.tables["ingredient_consumption"]
     row = t[(t.pharmacy_id == ph) & (t.ingredient_id == ing) & (t.event_timestamp <= at)]
     return float(row.sort_values("event_timestamp").iloc[-1]["consumption_7d_g"])
 
 
 def test_incremental_runs_cover_consecutive_intervals(small_world, tmp_path):
+    """A second run starts where the first stopped and refreshes values."""
     # A fresh registry + online DB over the shared small dataset.
     store = build_store(small_world.root / "feature_repo", tmp_path / "registry.db")
     apply_definitions(store)
@@ -46,6 +49,7 @@ def test_incremental_runs_cover_consecutive_intervals(small_world, tmp_path):
 
 
 def test_unknown_entity_returns_none(small_world, tmp_path):
+    """Entities never materialized come back as None."""
     store = build_store(small_world.root / "feature_repo", tmp_path / "registry.db")
     apply_definitions(store)
     run_incremental(store)

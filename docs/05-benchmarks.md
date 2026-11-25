@@ -75,17 +75,18 @@ Docker Desktop (2-vCPU / 1 GB VM). Full hardware details are in
 
 ### How to read it
 
-* **One entity, no contention: ~2 ms in the SDK, ~4 ms over HTTP.** FastAPI and
-  pydantic add about 2 ms on top of Feast + Redis.
-* **Batching amortises the cost.** 50 entities take ~14 ms over HTTP, about 0.3 ms per
-  entity, against ~4 ms for one. A model scoring 50 ingredients at once should call
-  `/features/batch`.
-* **Throughput saturates at one process.** Single-entity throughput is ~226 req/s at
-  concurrency 1 and ~285 req/s at concurrency 10. Above that, extra clients only queue:
-  at concurrency 50, p50 is 234 ms and throughput drops. Most of the per-request cost
-  is Python work in the Feast SDK (deserialising protobuf values, building the response
-  dict), and threads do not parallelise that under the GIL. The usual fix is more
-  processes behind a load balancer. That could **not** be measured here, because
+* **One entity, no contention: p50 1.90 ms in the SDK, 4.09 ms over HTTP.** The
+  2.19 ms difference is the whole HTTP path: the httpx client, uvicorn, FastAPI and
+  pydantic.
+* **Batching amortises the cost.** 50 entities had a p50 of 14.22 ms over HTTP
+  (≈0.28 ms per entity), against 4.09 ms for one. A model scoring 50 ingredients at once
+  should call `/features/batch`.
+* **One process saturates early.** Single-entity throughput was 225.8 req/s at
+  concurrency 1 and 284.7 req/s at concurrency 10. Above that, extra clients only queue:
+  at concurrency 50, p50 is 234.18 ms and throughput fell to 156.9 req/s. *Hypothesis
+  (not profiled):* most of the per-request time is Python work in the Feast SDK and the
+  API, which threads cannot run in parallel under the GIL, so more processes behind a
+  load balancer would be the usual fix. That could **not** be measured here, because
   uvicorn's multi-worker mode failed on Windows (see [benchmarks.md](benchmarks.md)).
 * **Tails are noisy on this machine.** An earlier run had the same medians but
   multi-second p99 outliers. Treat the p99 column as indicative only.

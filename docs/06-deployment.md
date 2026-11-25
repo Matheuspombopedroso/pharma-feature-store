@@ -34,9 +34,24 @@ Inside the compose network, Redis is reached as `redis:6379` through
 * `pyproject.toml` and `src/` are copied and installed before `feature_repo/`, so
   editing the Feast config does not re-run the slow dependency layer.
 * One uvicorn process by default. The benchmark ([part 5](05-benchmarks.md)) shows a
-  single process saturating at roughly 230–285 single-entity req/s, with most of the
-  time spent in Python. More processes are the usual way to scale this. That was not
-  measured here, because uvicorn's multi-worker mode failed on the Windows dev machine.
+  single process topping out at 225.8–284.7 single-entity req/s. More processes are the
+  usual way to scale this. That was not measured here, because uvicorn's multi-worker
+  mode failed on the Windows dev machine.
+
+## Run just this part
+
+```bash
+docker compose up --build            # full stack
+docker compose up -d redis           # only Redis, for local development
+docker compose logs materialize      # see the generate/apply/materialize output
+```
+
+## What to look at
+
+* `docker compose ps`: `materialize` should be `Exited (0)` and `api` should be `Up`.
+* `curl localhost:8000/health` should report `"online_store":"redis"`.
+* In CI (the Actions tab), the `Tests` step should show the Redis integration test
+  passing, not skipped.
 
 ## CI
 
