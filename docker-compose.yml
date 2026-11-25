@@ -1,0 +1,54 @@
+# docker compose up --build
+#
+# Three services:
+#   redis        - Feast online store (low-latency key/value reads)
+#   materialize  - one-shot job: generate synthetic data, feast apply,
+#                  incremental materialization into Redis; then exits
+#   api          - FastAPI online feature service on http://localhost:8000
+#
+# materialize and api share the "fsdata" volume, which holds the Parquet
+# feature tables and the Feast registry (data/registry.db). Both containers use
+# the same /app layout, so the relative paths in the registry resolve the same.
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    # No persistence: the online store is a cache that can always be rebuilt
+    # from the offline store by re-running materialization.
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  materialize:
+    build: .
+    command: ["pharma-fs", "setup"]
+    environment:
+      # Inside the compose network Redis is reachable by service name.
+      REDIS_CONNECTION_STRING: redis:6379
+    volumes:
+      - fsdata:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  api:
+    build: .
+    environment:
+      REDIS_CONNECTION_STRING: redis:6379
+    volumes:
+      - fsdata:/app/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      # The API needs the registry and a populated Redis, so wait for the
+      # one-shot job to finish successfully.
+      materialize:
+        condition: service_completed_successfully
+
+volumes:
+  fsdata:

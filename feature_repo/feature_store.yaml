@@ -1,0 +1,33 @@
+# Feast repository configuration.
+#
+# Relative paths here (and in definitions.py) are resolved by Feast against
+# this directory (the "repo path"), so ../data points at the repo's data/ dir.
+# The same layout exists inside the Docker image (/app/feature_repo, /app/data).
+
+# Namespace for every object in the registry.
+project: pharma_fs
+
+# The registry is a small protobuf file listing entities, sources and feature
+# views. It also records materialization intervals, which is what makes
+# `materialize_incremental` incremental.
+registry: ../data/registry.db
+
+# "local" provider: offline retrieval runs in this Python process.
+provider: local
+
+offline_store:
+  # File offline store: Parquet files + Feast's point-in-time join implemented
+  # with dask/pandas. Fine for a demo dataset; a real deployment would use a
+  # warehouse (BigQuery, Snowflake, Spark...).
+  type: file
+
+online_store:
+  type: redis
+  # Feast expands ${VAR} from the environment when it reads this file.
+  # localhost:6379 on the host, redis:6379 inside docker compose.
+  # pharma_fs.store sets a localhost default if the variable is unset.
+  connection_string: ${REDIS_CONNECTION_STRING}
+
+# Serialization format for entity keys in the online store. Version 3 is the
+# current default in Feast; it must not change once data is materialized.
+entity_key_serialization_version: 3
